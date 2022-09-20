@@ -1,6 +1,84 @@
 ---
 title: "Data Import"
-output: giyhub_document
+output: github_document
 ---
 
+```{r}
+library(tidyverse)
+```
+
+
 ## Data Import: CSVs
+
+Let's import data using the `readr` package
+This is a relative path, based on where the file is on my computer.  
+
+```{r}
+read_csv("data/FAS_litters.csv")
+litters_df= janitor :: clean_names(litter_df)
+litters_df
+```
+
+Look at the data
+
+```{r}
+head(litters_df)
+tail(litters_df)
+```
+
+The code below will give you a summary of the data
+
+```{r}
+skimr::skim(litters_df)
+```
+
+
+
+`read_csv` options...
+Says which values you will consider as missing, and that you skip the first 2 rows in the data set when reading it in 
+
+```{r}
+read_csv("data/FAS_litters.csv", na = c("", "NA", 999, 88), skip=2)
+```
+
+
+## Other file formats
+
+We need to read in an excel spreadsheet...
+
+```{r}
+library(readxl)
+mlb.df= read_excel ("data/mlb11.xlsx")
+```
+
+## Still more formats...
+
+Read in a SAS dataset.
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(haven)
+pulse_df= read_sas("data/public_pulse_data.sas7bdat")
+pulse_df
+```
+
+## Data Export
+
+```{r}
+write_csv(lotr_words_df, file="lotr_words_df.csv")
+```
+
+## Why not base R???
+```{r}
+dont_do_this_df= read.csv("data/FAS_litter.csv")
+```
+
+
+
+
+
+
+
+
+
