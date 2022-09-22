@@ -75,6 +75,8 @@ dont_do_this_df= read.csv("data/FAS_litter.csv")
 ```
 
 
+GitIgnore is a useful to make sure that you're not saving and uploading data that shouldn't be public.  
+
 
 
 

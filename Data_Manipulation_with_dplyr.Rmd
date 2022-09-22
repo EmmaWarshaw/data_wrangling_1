@@ -1,0 +1,26 @@
+---
+title: "Data_Manipulation_with_dplyr"
+author: "Emma Warshaw"
+date: "2022-09-22"
+output: github_document
+---
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+library(tidyverse)
+
+options(tibble.print_min = 3)
+litters_data = read_csv("./data/FAS_litters.csv")
+litters_data = janitor::clean_names(litters_data)
+pups_data = read_csv("./data/FAS_pups.csv")
+pups_data = janitor::clean_names(pups_data)
+```
+
+The janitor package has functions to clean up your data.  Here, we only call one function with :: to clean up the names in the litters_data file 
+
+
