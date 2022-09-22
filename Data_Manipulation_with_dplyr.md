@@ -126,7 +126,9 @@ select(litters_data, ends_with("weight"))
 ```
 
 I also frequently use is `everything()`, which is handy for reorganizing
-columns without discarding anything:
+columns without discarding anything:this will pull the three variables
+to the front of the data set, and stick everything else behind it for
+ease of use with the data set
 
 ``` r
 select(litters_data, litter_number, pups_survive, everything())
@@ -156,19 +158,25 @@ first argument to `filter` is the dataframe you’re filtering; all
 subsequent arguments are logical expressions.
 
 You will often filter using comparison operators (`>`, `>=`, `<`, `<=`,
-`==`, and `!=`). You may also use `%in%` to detect if values appear in a
-set, and `is.na()` to find missing values. The results of comparisons
-are logical – the statement is `TRUE` or `FALSE` depending on the values
-you compare – and can be combined with other comparisons using the
-logical operators `&` and `|`, or negated using `!`.
+`==`(equal), and `!=`(not equal)). We have to use the 2 equal signs to
+distinguish betwee assigning a value to something (`=`) and actually
+testing an expression (`==`)
+
+You may also use `%in%` to detect if values appear in a set, and
+`is.na()` to find missing values. The results of comparisons are logical
+– the statement is `TRUE` or `FALSE` depending on the values you compare
+– and can be combined with other comparisons using the logical operators
+`&` = and `|`, = or `!` = negate.
 
 Some ways you might filter the litters data are:
 
 -   `gd_of_birth == 20`
 -   `pups_born_alive >= 2`
 -   `pups_survive != 4`
--   `!(pups_survive == 4)`
--   `group %in% c("Con7", "Con8")`
+-   `!(pups_survive == 4)` –\> filters out the rows where things are
+    equal to 4
+-   `group %in% c("Con7", "Con8")` –\> select all the observations where
+    group is equal to Con7 or Con8, useful for character variables
 -   `group == "Con7" & gd_of_birth == 20`
 
 Let’s try one or two…
@@ -202,6 +210,9 @@ A very common filtering step requires you to omit missing observations.
 You *can* do this with `filter`, but I recommend using `drop_na` from
 the `tidyr` package:
 
+`drop_na` will drop rows where the variables you define is missing
+values
+
 -   `drop_na(litters_data)` will remove any row with a missing value
 -   `drop_na(litters_data, wt_increase)` will remove rows for which
     `wt_increase` is missing.
@@ -225,7 +236,7 @@ variable.
 #litter_data2 =
 mutate(litters_data,
   wt_gain = gd18_weight - gd0_weight,
-  group = str_to_lower(group),
+  group = str_to_lower(group), #takes the string group and makes it lower case
  # wt_gain_kg = wt_gain * 2.2
 )
 ## # A tibble: 49 × 9
@@ -252,6 +263,9 @@ challenge; the more functions you know about, the easier this gets.
 
 ### `arrange`
 
+This rearranges the rows in your data set. It’s like the sort sunction
+in SAS.
+
 In comparison to the preceding, arranging is pretty straightforward. You
 can arrange the rows in your data according to the values in one or more
 columns:
@@ -274,6 +288,9 @@ head(arrange(litters_data, group, pups_born_alive), 10)
 ## # … with abbreviated variable names ¹​gd_of_birth, ²​pups_born_alive,
 ## #   ³​pups_dead_birth, ⁴​pups_survive
 ```
+
+Data set is litters, first it will sort on group, then it will sort on
+pups_born_alive.
 
 You can also sort in descending order if you’d like.
 
@@ -310,10 +327,10 @@ this kind of multi-step data manipulation:
 The following is an example of the first option:
 
 ``` r
-litters_data_raw = read_csv("./data/FAS_litters.csv",
+litters_data_raw = read_csv("./data/FAS_litters.csv", #load data in 
   col_types = "ccddiiii")
-litters_data_clean_names = janitor::clean_names(litters_data_raw)
-litters_data_selected_cols = select(litters_data_clean_names, -pups_survive)
+litters_data_clean_names = janitor::clean_names(litters_data_raw) #clean it
+litters_data_selected_cols = select(litters_data_clean_names, -pups_survive) #this sucks, too many intermediary data sets
 litters_data_with_vars = 
   mutate(
     litters_data_selected_cols, 
@@ -335,7 +352,7 @@ litters_data_with_vars_without_missing
 Below, we try the second option:
 
 ``` r
-litters_data_clean = 
+litters_data_clean = #this also sucks 
   drop_na(
     mutate(
       select(
@@ -367,11 +384,17 @@ Piping solves this problem. It allows you to turn the nested approach
 into a sequential chain by passing the result of one function call as an
 argument to the next function call:
 
+Essentially doing all of the manipulations that we already did today,
+but we do it in order with the pipe operator `%>%`. It makes it so you
+don’t have to specify the path every time, it just carries it through
+
+Keyboard shortcut for the pipe operator: control+shift+m
+
 ``` r
-litters_data = 
-  read_csv("./data/FAS_litters.csv", col_types = "ccddiiii") %>%
-  janitor::clean_names() %>%
-  select(-pups_survive) %>%
+litters_data = #this assigns everything that follows to the litters_data to store it in a tibble at the very end
+  read_csv("./data/FAS_litters.csv", col_types = "ccddiiii") %>% #read in the csv, creates a tibble
+  janitor::clean_names() %>% #cleans the tibble, no longer have to specify a data set 
+  select(-pups_survive) %>% #
   mutate(
     wt_gain = gd18_weight - gd0_weight,
     group = str_to_lower(group)) %>% 
@@ -389,7 +412,7 @@ litters_data
 
 All three approaches result in the same dataset, but the piped commands
 are by far the most straightforward. The easiest way to read `%>%` is
-“then”; the keyboard shortcuts are Ctrl + Shift + M (Windows) and Cmd +
+“then”; the keyboard shortcuts are Ctrl + Shift + M (Windows) and Ctrl +
 Shift + M (Mac).
 
 The functions in `dplyr` (and much of the `tidyverse`) are designed to
